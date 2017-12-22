@@ -4,7 +4,7 @@
 
 #include "GuiFactory.hpp"
 
-namespace hercules
+namespace ice_engine
 {
 
 GuiPlugin::GuiPlugin()

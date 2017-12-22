@@ -26,7 +26,7 @@ endif()
 
 # Dependencies
 set(PROJECT_LINK_LIBRARY_DIRECTORIES
-  ../../hercules/deps/glew/lib
+  ../../ice_engine/deps/glew/lib
 )
 
 find_library(GLEW_LIBRARY NAMES libGLEW.so.2.0 glew32 PATHS ${PROJECT_LINK_LIBRARY_DIRECTORIES})
@@ -35,11 +35,11 @@ find_package(Threads REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(X11 REQUIRED)
 
-include_directories(../../hercules/deps/boost/include)
-include_directories(../../hercules/deps/glew/include)
-include_directories(../../hercules/deps/glm/include)
+include_directories(../../ice_engine/deps/boost/include)
+include_directories(../../ice_engine/deps/glew/include)
+include_directories(../../ice_engine/deps/glm/include)
 
-include_directories(../../hercules/include)
+include_directories(../../ice_engine/include)
 
 # Headers
 include_directories(include)

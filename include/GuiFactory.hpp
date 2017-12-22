@@ -6,7 +6,7 @@
 #include "graphics/IGraphicsEngine.hpp"
 #include "graphics/gui/IGuiFactory.hpp"
 
-namespace hercules
+namespace ice_engine
 {
 namespace graphics
 {

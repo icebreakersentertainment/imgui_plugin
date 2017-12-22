@@ -3,7 +3,7 @@
 #include "Label.hpp"
 #include "Button.hpp"
 
-namespace hercules
+namespace ice_engine
 {
 namespace graphics
 {
@@ -37,37 +37,37 @@ Window::~Window()
 
 void Window::initialize()
 {
-	if (!(flags_ & HERCULES_TITLE_BAR))
+	if (!(flags_ & ICEENGINE_TITLE_BAR))
 	{
 		imguiFlags_ |= ImGuiWindowFlags_NoTitleBar;
 	}
-	if (flags_ & HERCULES_SHOW_BORDERS)
+	if (flags_ & ICEENGINE_SHOW_BORDERS)
 	{
 		imguiFlags_ |= ImGuiWindowFlags_ShowBorders;
 	}
-	if (!(flags_ & HERCULES_MOVABLE))
+	if (!(flags_ & ICEENGINE_MOVABLE))
 	{
 		imguiFlags_ |= ImGuiWindowFlags_NoMove;
 	}
-	if (flags_ & HERCULES_NO_SCROLLBAR)
+	if (flags_ & ICEENGINE_NO_SCROLLBAR)
 	{
 		imguiFlags_ |= ImGuiWindowFlags_NoScrollbar;
 	}
 	/*
-	if (!(flags_ & HERCULES_CLOSABLE))
+	if (!(flags_ & ICEENGINE_CLOSABLE))
 	{
 		imguiFlags_ |= ImGuiWindowFlags_NoCollapse;
 	}
 	*/
-	if (!(flags_ & HERCULES_MINIMIZABLE))
+	if (!(flags_ & ICEENGINE_MINIMIZABLE))
 	{
 		imguiFlags_ |= ImGuiWindowFlags_NoCollapse;
 	}
-	if (!(flags_ & HERCULES_RESIZABLE))
+	if (!(flags_ & ICEENGINE_RESIZABLE))
 	{
 		imguiFlags_ |= ImGuiWindowFlags_NoResize;
 	}
-	if (flags_ & HERCULES_NO_INPUT)
+	if (flags_ & ICEENGINE_NO_INPUT)
 	{
 		imguiFlags_ |= ImGuiWindowFlags_NoInputs;
 	}
