@@ -2,6 +2,7 @@
 #define GUI_H_
 
 #include <vector>
+#include <memory>
 
 #include "graphics/IGraphicsEngine.hpp"
 #include "graphics/gui/IGui.hpp"
@@ -15,12 +16,21 @@
 #include "logger/ILogger.hpp"
 #include "fs/IFileSystem.hpp"
 
+class ImGuiContext;
+class SdlData;
+
 namespace ice_engine
 {
 namespace graphics
 {
 namespace gui
 {
+
+struct ImGuiData
+{
+	ImGuiContext* context = nullptr;
+	SdlData* sdlData = nullptr;
+};
 
 class Gui : public IGui, public graphics::IEventListener
 {
@@ -41,6 +51,7 @@ public:
 	virtual IWindow* createWindow(const uint32 x, const uint32 y, const uint32 width, const uint32 height, const std::string title = std::string()) override;
 	virtual IWindow* createWindow(const uint32 x, const uint32 y, const uint32 width, const uint32 height, const uint32 flags, const std::string title = std::string()) override;
 	
+	virtual bool processEvent(const graphics::WindowEvent& event) override;
 	virtual bool processEvent(const graphics::KeyboardEvent& event) override;
 	virtual bool processEvent(const graphics::MouseButtonEvent& event) override;
 	virtual bool processEvent(const graphics::MouseMotionEvent& event) override;
@@ -55,6 +66,8 @@ private:
 	logger::ILogger* logger_;
 	
 	IGraphicsEngine* graphicsEngine_;
+	
+	std::unique_ptr<ImGuiData, void(*)(ImGuiData*)> imGuiData_;
 	
 	std::vector<IComponent*> components_;
 	std::vector<std::unique_ptr<IWindow>> windows_;

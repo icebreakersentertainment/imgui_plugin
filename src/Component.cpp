@@ -20,11 +20,6 @@ Component::Component(const uint32 x, const uint32 y, const uint32 width, const u
 	initialize();
 }
 
-Component::~Component()
-{
-	
-}
-
 void Component::initialize()
 {
 	

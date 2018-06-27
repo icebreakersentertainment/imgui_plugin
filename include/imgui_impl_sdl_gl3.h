@@ -9,11 +9,26 @@
 //struct SDL_Window;
 //typedef union SDL_Event SDL_Event;
 
-IMGUI_API bool        ImGui_ImplSdlGL3_Init();
-IMGUI_API void        ImGui_ImplSdlGL3_Shutdown();
-IMGUI_API void        ImGui_ImplSdlGL3_NewFrame();
+// Data
+struct SdlData
+{
+	double       time = 0.0f;
+	bool         mousePressed[3] = { false, false, false };
+	float        mouseWheel = 0.0f;
+	GLuint       fontTexture = 0;
+	int          shaderHandle = 0, vertHandle = 0, fragHandle = 0;
+	int          attribLocationTex = 0, attribLocationProjMtx = 0;
+	int          attribLocationPosition = 0, attribLocationUV = 0, attribLocationColor = 0;
+	unsigned int vboHandle = 0, vaoHandle = 0, elementsHandle = 0;
+};
+
+IMGUI_API bool        ImGui_ImplSdlGL3_Init(SdlData* sdl_data);
+IMGUI_API void        ImGui_ImplSdlGL3_Shutdown(SdlData* sdl_data);
+IMGUI_API void        ImGui_ImplSdlGL3_NewFrame(SdlData* sdl_data);
 //IMGUI_API bool        ImGui_ImplSdlGL3_ProcessEvent(SDL_Event* event);
 
+IMGUI_API void        ImGui_ImplSdlGL3_RenderDrawLists(SdlData* sdl_data, ImDrawData* draw_data);
+
 // Use if you want to reset your rendering device without losing ImGui state.
-IMGUI_API void        ImGui_ImplSdlGL3_InvalidateDeviceObjects();
-IMGUI_API bool        ImGui_ImplSdlGL3_CreateDeviceObjects();
+IMGUI_API void        ImGui_ImplSdlGL3_InvalidateDeviceObjects(SdlData* sdl_data);
+IMGUI_API bool        ImGui_ImplSdlGL3_CreateDeviceObjects(SdlData* sdl_data);

@@ -16,8 +16,9 @@ namespace gui
 class Component : public virtual IComponent
 {
 public:
+	Component() = default;
 	Component(const uint32 x, const uint32 y, const uint32 width, const uint32 height, const bool visible = true);
-	virtual ~Component();
+	//virtual ~Component();
 
 	virtual void render() override;
 	virtual void tick(const float32 delta) override;
@@ -33,11 +34,13 @@ public:
 	virtual void removeAllComponents() override;
 	
 protected:
-	uint32 x_;
-	uint32 y_;
-	uint32 width_;
-	uint32 height_;
-	bool visible_;
+	virtual ~Component() = default;
+	
+	uint32 x_ = 0;
+	uint32 y_ = 0;
+	uint32 width_ = 0;
+	uint32 height_ = 0;
+	bool visible_ = true;
 	
 	std::vector<std::unique_ptr<IComponent>> components_;
 	

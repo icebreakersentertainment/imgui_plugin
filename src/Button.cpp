@@ -28,14 +28,6 @@ void Button::initialize()
 	
 }
 
-void Button::render()
-{
-	for (auto& component : components_)
-	{
-		component->render();
-	}
-}
-
 void Button::tick(const float32 delta)
 {
 	if (ImGui::Button(label_.c_str()))

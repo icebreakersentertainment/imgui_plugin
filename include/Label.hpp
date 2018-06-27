@@ -18,7 +18,6 @@ public:
 	Label(const uint32 x, const uint32 y, const uint32 width, const uint32 height, const std::string& label = std::string());
 	virtual ~Label();
 
-	virtual void render() override;
 	virtual void tick(const float32 delta) override;
 	
 	virtual void setLabel(const std::string& label) override;

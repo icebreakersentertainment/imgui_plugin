@@ -27,14 +27,6 @@ void Label::initialize()
 	
 }
 
-void Label::render()
-{
-	for (auto& component : components_)
-	{
-		component->render();
-	}
-}
-
 void Label::tick(const float32 delta)
 {
 	ImGui::Text(label_.c_str());

@@ -2,6 +2,7 @@
 
 #include "Label.hpp"
 #include "Button.hpp"
+#include "MenuBar.hpp"
 
 namespace ice_engine
 {
@@ -67,10 +68,16 @@ void Window::initialize()
 	{
 		imguiFlags_ |= ImGuiWindowFlags_NoResize;
 	}
+	if (flags_ & ICEENGINE_MENUBAR)
+	{
+		imguiFlags_ |= ImGuiWindowFlags_MenuBar;
+	}
 	if (flags_ & ICEENGINE_NO_INPUT)
 	{
 		imguiFlags_ |= ImGuiWindowFlags_NoInputs;
 	}
+	
+	//imguiFlags_ |= ImGuiWindowFlags_NoSavedSettings;
 	
 	/*
 	ImGuiWindowFlags_NoTitleBar;
@@ -83,6 +90,7 @@ if (!no_menu) window_flags |= ImGuiWindowFlags_MenuBar;
 */
 }
 
+/*
 void Window::render()
 {
 	if (visible_)
@@ -93,13 +101,14 @@ void Window::render()
 		}
 	}
 }
+*/
 
 void Window::tick(const float32 delta)
 {
 	if (visible_)
 	{
-		ImGui::SetNextWindowPos(ImVec2(x_, y_), ImGuiCond_Once);
-		ImGui::SetNextWindowSize(ImVec2(width_, height_), ImGuiCond_Once);
+		ImGui::SetNextWindowPos(ImVec2(x_, y_), ImGuiCond_Always);
+		ImGui::SetNextWindowSize(ImVec2(width_, height_), ImGuiCond_Always);
 		
 		if (!ImGui::Begin(title_.c_str(), &visible_, imguiFlags_))
 		{
@@ -129,6 +138,15 @@ IButton* Window::createButton(const uint32 x, const uint32 y, const uint32 width
 	components_.push_back( std::move(button) );
 	
 	return buttonPtr;
+}
+
+IMenuBar* Window::createMenuBar()
+{
+	auto menuBar = std::make_unique<MenuBar>();
+	auto menuBarPtr = menuBar.get();
+	components_.push_back( std::move(menuBar) );
+	
+	return menuBarPtr;
 }
 
 void Window::setTitle(const std::string& title)

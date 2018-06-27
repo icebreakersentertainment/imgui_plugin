@@ -38,6 +38,7 @@ find_package(X11 REQUIRED)
 include_directories(../../ice_engine/deps/boost/include)
 include_directories(../../ice_engine/deps/glew/include)
 include_directories(../../ice_engine/deps/glm/include)
+include_directories(../../ice_engine/deps/freeimage/include)
 
 include_directories(../../ice_engine/include)
 

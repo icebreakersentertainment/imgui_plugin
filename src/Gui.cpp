@@ -12,6 +12,15 @@ namespace graphics
 namespace gui
 {
 
+void shutdown(ImGuiData* imGuiData)
+{
+	ImGui::SetCurrentContext(imGuiData->context);
+	
+	ImGui_ImplSdlGL3_Shutdown(imGuiData->sdlData);
+	
+	ImGui::DestroyContext(imGuiData->context);
+}
+
 Gui::Gui(
 	utilities::Properties* properties,
 	fs::IFileSystem* fileSystem,
@@ -22,6 +31,7 @@ Gui::Gui(
 	properties_(properties),
 	fileSystem_(fileSystem),
 	logger_(logger),
+	imGuiData_(nullptr, shutdown),
 	graphicsEngine_(graphicsEngine)
 {
 	initialize();
@@ -29,14 +39,20 @@ Gui::Gui(
 
 Gui::~Gui()
 {
-	ImGui_ImplSdlGL3_Shutdown();
-	
 	graphicsEngine_->removeEventListener(this);
 }
 
 void Gui::initialize()
 {
-	ImGui_ImplSdlGL3_Init();
+	imGuiData_ = std::unique_ptr<ImGuiData, void(*)(ImGuiData*)>(new ImGuiData(), shutdown);
+	imGuiData_->sdlData = new SdlData();
+	//memset(sdlData_, 0, sizeof(SdlData));
+	
+	imGuiData_->context = ImGui::CreateContext();
+    
+    ImGui::SetCurrentContext(imGuiData_->context);
+    
+	ImGui_ImplSdlGL3_Init(imGuiData_->sdlData);
 	
 	const glm::uvec2 viewport = graphicsEngine_->getViewport();
 
@@ -50,6 +66,8 @@ void Gui::setViewport(const uint32 width, const uint32 height)
 	//width_ = width;
 	//height_ = height;
 	
+	ImGui::SetCurrentContext(imGuiData_->context);
+	
 	ImGuiIO& io = ImGui::GetIO();
 	
     io.DisplaySize = ImVec2((float)width, (float)height);
@@ -58,6 +76,7 @@ void Gui::setViewport(const uint32 width, const uint32 height)
 
 void Gui::render()
 {
+	ImGui::SetCurrentContext(imGuiData_->context);
 	//ImGui_ImplSdlGL3_NewFrame();
 	
 	for (auto component : components_)
@@ -71,11 +90,16 @@ void Gui::render()
 	}
 	
 	ImGui::Render();
+	
+	auto drawData = ImGui::GetDrawData();
+	ImGui_ImplSdlGL3_RenderDrawLists(imGuiData_->sdlData, drawData);
 }
 
 void Gui::tick(const float32 delta)
 {
-	ImGui_ImplSdlGL3_NewFrame();
+	ImGui::SetCurrentContext(imGuiData_->context);
+	
+	ImGui_ImplSdlGL3_NewFrame(imGuiData_->sdlData);
 	
 	for (auto component : components_)
 	{
@@ -104,8 +128,15 @@ IWindow* Gui::createWindow(const uint32 x, const uint32 y, const uint32 width, c
 	return windows_.back().get();
 }
 
+bool Gui::processEvent(const graphics::WindowEvent& event)
+{
+	return false;
+}
+
 bool Gui::processEvent(const graphics::KeyboardEvent& event)
 {
+	ImGui::SetCurrentContext(imGuiData_->context);
+	
 	int down = (event.state == graphics::KeyState::KEY_PRESSED);
 	//const Uint8* state = 0;//SDL_GetKeyboardState(0);
 	//SDL_Keycode sym = evt->key.keysym.sym;
@@ -217,6 +248,8 @@ bool Gui::processEvent(const graphics::KeyboardEvent& event)
 
 bool Gui::processEvent(const graphics::MouseButtonEvent& event)
 {
+	ImGui::SetCurrentContext(imGuiData_->context);
+	
 	ImGuiIO& io = ImGui::GetIO();
 	
 	int down = (event.state == graphics::KeyState::KEY_PRESSED);
@@ -246,6 +279,8 @@ bool Gui::processEvent(const graphics::MouseButtonEvent& event)
 
 bool Gui::processEvent(const graphics::MouseMotionEvent& event)
 {
+	ImGui::SetCurrentContext(imGuiData_->context);
+	
 	ImGuiIO& io = ImGui::GetIO();
 	
 	io.MousePos = ImVec2((float)event.x, (float)event.y);
@@ -255,6 +290,8 @@ bool Gui::processEvent(const graphics::MouseMotionEvent& event)
 
 bool Gui::processEvent(const graphics::MouseWheelEvent& event)
 {
+	ImGui::SetCurrentContext(imGuiData_->context);
+	
 	ImGuiIO& io = ImGui::GetIO();
 	
 	//nk_input_scroll(ctx_, nk_vec2((float)event.x,(float)event.y));
@@ -265,6 +302,8 @@ bool Gui::processEvent(const graphics::MouseWheelEvent& event)
 
 bool Gui::processEvent(const graphics::Event& event)
 {
+	ImGui::SetCurrentContext(imGuiData_->context);
+	
 	switch(event.type)
 	{
 		case graphics::WINDOWEVENT:
