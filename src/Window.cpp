@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include "Window.hpp"
 
 #include "Label.hpp"
@@ -147,6 +149,34 @@ IMenuBar* Window::createMenuBar()
 	components_.push_back( std::move(menuBar) );
 	
 	return menuBarPtr;
+}
+
+void Window::destroy(const ILabel* label)
+{
+	components_.erase(
+		std::remove_if(
+			components_.begin(),
+			components_.end(),
+			[label](const std::unique_ptr<IComponent>& c) {
+				return c.get() == label;
+			}
+		),
+		components_.end()
+	);
+}
+
+void Window::destroy(const IButton* button)
+{
+	components_.erase(
+		std::remove_if(
+			components_.begin(),
+			components_.end(),
+			[button](const std::unique_ptr<IComponent>& c) {
+				return c.get() == button;
+			}
+		),
+		components_.end()
+	);
 }
 
 void Window::setTitle(const std::string& title)

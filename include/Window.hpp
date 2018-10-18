@@ -27,6 +27,9 @@ public:
 	virtual IButton* createButton(const uint32 x, const uint32 y, const uint32 width, const uint32 height, const std::string label = std::string()) override;
 	virtual IMenuBar* createMenuBar() override;
 	
+	virtual void destroy(const ILabel* label) override;
+	virtual void destroy(const IButton* button) override;
+
 	virtual void setTitle(const std::string& title) override;
 	virtual const std::string& getTitle() const  override;
     

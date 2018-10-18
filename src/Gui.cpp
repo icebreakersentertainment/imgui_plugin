@@ -136,7 +136,7 @@ bool Gui::processEvent(const graphics::WindowEvent& event)
 bool Gui::processEvent(const graphics::KeyboardEvent& event)
 {
 	ImGui::SetCurrentContext(imGuiData_->context);
-	
+
 	int down = (event.state == graphics::KeyState::KEY_PRESSED);
 	//const Uint8* state = 0;//SDL_GetKeyboardState(0);
 	//SDL_Keycode sym = evt->key.keysym.sym;
@@ -243,13 +243,13 @@ bool Gui::processEvent(const graphics::KeyboardEvent& event)
 			break;
     }
 	
-	return false;
+	return ImGui::GetIO().WantCaptureKeyboard || ImGui::GetIO().WantTextInput;
 }
 
 bool Gui::processEvent(const graphics::MouseButtonEvent& event)
 {
 	ImGui::SetCurrentContext(imGuiData_->context);
-	
+
 	ImGuiIO& io = ImGui::GetIO();
 	
 	int down = (event.state == graphics::KeyState::KEY_PRESSED);
@@ -274,7 +274,7 @@ bool Gui::processEvent(const graphics::MouseButtonEvent& event)
 			break;
 	}
 	
-	return false;
+	return ImGui::GetIO().WantCaptureMouse;
 }
 
 bool Gui::processEvent(const graphics::MouseMotionEvent& event)
@@ -285,7 +285,7 @@ bool Gui::processEvent(const graphics::MouseMotionEvent& event)
 	
 	io.MousePos = ImVec2((float)event.x, (float)event.y);
 	
-	return false;
+	return ImGui::GetIO().WantCaptureMouse;
 }
 
 bool Gui::processEvent(const graphics::MouseWheelEvent& event)
@@ -297,7 +297,7 @@ bool Gui::processEvent(const graphics::MouseWheelEvent& event)
 	//nk_input_scroll(ctx_, nk_vec2((float)event.x,(float)event.y));
 	io.MouseWheel = (event.y > 0 ? 1 : -1);
 	
-	return false;
+	return ImGui::GetIO().WantCaptureMouse;
 }
 
 bool Gui::processEvent(const graphics::Event& event)
