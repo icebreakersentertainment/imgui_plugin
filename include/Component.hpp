@@ -23,6 +23,17 @@ public:
 	virtual void render() override;
 	virtual void tick(const float32 delta) override;
 	
+	virtual void setStyle(const Style& style) override
+			{
+				style_ = style;
+				customStyle_ = true;
+			}
+
+	virtual const Style& getStyle() const override
+			{
+				return style_;
+			}
+
 	virtual void setPosition(const uint32 x, const uint32 y) override;
 	virtual glm::ivec2 getPosition() const override;
 	
@@ -42,10 +53,15 @@ protected:
 	uint32 height_ = 0;
 	bool visible_ = true;
 	
+	Style style_;
+	bool customStyle_ = false;
+
 	std::vector<std::unique_ptr<IComponent>> components_;
 	
 private:
+
 	void initialize();
+
 };
 
 }

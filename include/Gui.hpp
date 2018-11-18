@@ -48,6 +48,17 @@ public:
 	virtual void render() override;
 	virtual void tick(const float32 delta) override;
 	
+	virtual void setStyle(const Style& style) final
+			{
+				style_ = style;
+				// TODO: set the global style
+			}
+
+	virtual const Style& getStyle() const final
+			{
+				return style_;
+			}
+
 	virtual IWindow* createWindow(const uint32 x, const uint32 y, const uint32 width, const uint32 height, const std::string title = std::string()) override;
 	virtual IWindow* createWindow(const uint32 x, const uint32 y, const uint32 width, const uint32 height, const uint32 flags, const std::string title = std::string()) override;
 	
@@ -72,6 +83,8 @@ private:
 	std::vector<IComponent*> components_;
 	std::vector<std::unique_ptr<IWindow>> windows_;
 	
+	Style style_;
+
 	void initialize();
 };
 

@@ -5,6 +5,7 @@
 #include "Label.hpp"
 #include "Button.hpp"
 #include "MenuBar.hpp"
+#include "Rectangle.hpp"
 
 namespace ice_engine
 {
@@ -43,10 +44,6 @@ void Window::initialize()
 	if (!(flags_ & ICEENGINE_TITLE_BAR))
 	{
 		imguiFlags_ |= ImGuiWindowFlags_NoTitleBar;
-	}
-	if (flags_ & ICEENGINE_SHOW_BORDERS)
-	{
-		imguiFlags_ |= ImGuiWindowFlags_ShowBorders;
 	}
 	if (!(flags_ & ICEENGINE_MOVABLE))
 	{
@@ -111,16 +108,21 @@ void Window::tick(const float32 delta)
 	{
 		ImGui::SetNextWindowPos(ImVec2(x_, y_), ImGuiCond_Always);
 		ImGui::SetNextWindowSize(ImVec2(width_, height_), ImGuiCond_Always);
+		ImGui::SetNextWindowBgAlpha(alpha_);
 		
-		if (!ImGui::Begin(title_.c_str(), &visible_, imguiFlags_))
+		if (customStyle_)
 		{
-			ImGui::End();
-			return;
+			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, style_.alpha);
+		}
+
+		if (ImGui::Begin(title_.c_str(), &visible_, imguiFlags_))
+		{
+			Component::tick(delta);
 		}
 		
-		Component::tick(delta);	
-		
 		ImGui::End();
+
+		if (customStyle_) ImGui::PopStyleVar(1);
 	}
 }
 
@@ -151,6 +153,15 @@ IMenuBar* Window::createMenuBar()
 	return menuBarPtr;
 }
 
+IRectangle* Window::createRectangle(const glm::vec2& start, const glm::vec2& end, const Color& color)
+{
+	auto rectangle = std::make_unique<Rectangle>(start, end, color);
+	auto rectanglePtr = rectangle.get();
+	components_.push_back( std::move(rectangle) );
+
+	return rectanglePtr;
+}
+
 void Window::destroy(const ILabel* label)
 {
 	components_.erase(
@@ -173,6 +184,20 @@ void Window::destroy(const IButton* button)
 			components_.end(),
 			[button](const std::unique_ptr<IComponent>& c) {
 				return c.get() == button;
+			}
+		),
+		components_.end()
+	);
+}
+
+void Window::destroy(const IRectangle* rectangle)
+{
+	components_.erase(
+		std::remove_if(
+			components_.begin(),
+			components_.end(),
+			[rectangle](const std::unique_ptr<IComponent>& c) {
+				return c.get() == rectangle;
 			}
 		),
 		components_.end()

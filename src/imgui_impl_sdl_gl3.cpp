@@ -333,7 +333,7 @@ bool    ImGui_ImplSdlGL3_Init(SdlData* sdl_data)
 void ImGui_ImplSdlGL3_Shutdown(SdlData* sdl_data)
 {
     ImGui_ImplSdlGL3_InvalidateDeviceObjects(sdl_data);
-    ImGui::Shutdown();
+//    ImGui::Shutdown();
 }
 
 void ImGui_ImplSdlGL3_NewFrame(SdlData* sdl_data)
