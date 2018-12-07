@@ -171,9 +171,9 @@ void ImGui_ImplSdlGL3_CreateFontsTexture(SdlData* sdl_data)
 {
     // Build texture atlas
     ImGuiIO& io = ImGui::GetIO();
-    
+
     io.Fonts = new ImFontAtlas();
-    
+
     unsigned char* pixels;
     int width, height;
     io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);   // Load as RGBA 32-bits for OpenGL3 demo because it is more likely to be compatible with user's existing shader.
@@ -366,7 +366,7 @@ void ImGui_ImplSdlGL3_NewFrame(SdlData* sdl_data)
     //else
     //    io.MousePos = ImVec2(-FLT_MAX, -FLT_MAX);
     //io.MousePos = ImVec2(-FLT_MAX, -FLT_MAX);
-	
+
 	//io.MouseDown[0] = false;
 	//io.MouseDown[1] = false;
 	//io.MouseDown[2] = false;
