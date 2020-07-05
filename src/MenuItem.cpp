@@ -16,17 +16,26 @@ MenuItem::MenuItem(const std::string& label) : label_(label), callback_([]() {})
 
 MenuItem::~MenuItem()
 {
-	
+
 }
 
 void MenuItem::initialize()
 {
-	
+
 }
 
 void MenuItem::tick(const float32 delta)
 {
-	if (ImGui::MenuItem(label_.c_str()))
+	if (components_.size() > 0)
+	{
+		if (ImGui::BeginMenu(label_.c_str(), !disabled_))
+		{
+			for (auto& c : components_) c->tick(delta);
+
+			ImGui::EndMenu();
+		}
+	}
+	else if (ImGui::MenuItem(label_.c_str(), "", false, !disabled_))
 	{
 		callback_();
 	}
@@ -37,7 +46,7 @@ void MenuItem::setLabel(const std::string& label)
 	label_ = label;
 }
 
-const std::string& MenuItem::getLabel() const 
+const std::string& MenuItem::getLabel() const
 {
 	return label_;
 }
@@ -45,6 +54,16 @@ const std::string& MenuItem::getLabel() const
 void MenuItem::setCallback(std::function<void()>& callback)
 {
 	callback_ = callback;
+}
+
+IMenuItem* MenuItem::createMenuItem(const std::string& label)
+{
+	auto menuItem = std::make_unique<MenuItem>(label);
+	auto menuItemPtr = menuItem.get();
+
+	components_.push_back( std::move(menuItem) );
+
+	return menuItemPtr;
 }
 
 }

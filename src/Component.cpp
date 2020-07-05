@@ -1,5 +1,7 @@
 #include <algorithm>
 
+#include "imgui.h"
+
 #include "Component.hpp"
 
 namespace ice_engine
@@ -22,7 +24,7 @@ Component::Component(const uint32 x, const uint32 y, const uint32 width, const u
 
 void Component::initialize()
 {
-	
+
 }
 
 void Component::render()
@@ -35,16 +37,24 @@ void Component::render()
 
 void Component::tick(const float32 delta)
 {
+    ImGui::PushID(uuid_.c_str());
+
 	for (auto& component : components_)
 	{
 		component->tick(delta);
 	}
+
+    ImGui::PopID();
+
+	repositioned_ = false;
+	resized_ = false;
 }
 
 void Component::setPosition(const uint32 x, const uint32 y)
 {
 	x_ = x;
 	y_ = y;
+	repositioned_ = true;
 }
 
 glm::ivec2 Component::getPosition() const
@@ -56,9 +66,10 @@ void Component::setDimensions(const uint32 width, const uint32 height)
 {
 	width_ = width;
 	height_ = height;
+	resized_ = true;
 }
 
-glm::ivec2 Component::getDimensions() const 
+glm::ivec2 Component::getDimensions() const
 {
 	return glm::ivec2(width_, height_);
 }
@@ -73,9 +84,9 @@ void Component::removeComponent(IComponent* component)
 	auto func = [component](const auto& comp) {
 		return comp.get() == component;
 	};
-	
+
 	auto it = std::find_if(components_.begin(), components_.end(), func);
-	
+
 	if (it != components_.end())
 	{
 		components_.erase(it);
@@ -90,4 +101,3 @@ void Component::removeAllComponents()
 }
 }
 }
-

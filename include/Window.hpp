@@ -6,6 +6,7 @@
 #include "imgui.h"
 
 #include "Component.hpp"
+#include "GenericComponentContainer.hpp"
 
 namespace ice_engine
 {
@@ -14,7 +15,7 @@ namespace graphics
 namespace gui
 {
 
-class Window : public Component, public IWindow
+class Window : public GenericComponentContainer, public IWindow
 {
 public:
 	Window(const uint32 x, const uint32 y, const uint32 width, const uint32 height, const std::string& title = std::string());
@@ -22,30 +23,26 @@ public:
 	virtual ~Window();
 
 	virtual void tick(const float32 delta) override;
-	
-	virtual ILabel* createLabel(const uint32 x, const uint32 y, const uint32 width, const uint32 height, const std::string label = std::string()) override;
-	virtual IButton* createButton(const uint32 x, const uint32 y, const uint32 width, const uint32 height, const std::string label = std::string()) override;
+
 	virtual IMenuBar* createMenuBar() override;
-	virtual IRectangle* createRectangle(const glm::vec2& start, const glm::vec2& end, const Color& color) final;
-	
-	virtual void destroy(const ILabel* label) override;
-	virtual void destroy(const IButton* button) override;
-	virtual void destroy(const IRectangle* rectangle) final;
+	virtual IRectangle* createRectangle(const glm::vec2& start, const glm::vec2& end, const Color& color) override final;
+
+	virtual void destroy(const IRectangle* rectangle) override final;
 
 	virtual void setTitle(const std::string& title) override;
-	virtual const std::string& getTitle() const  override;
+	virtual const std::string& getTitle() const override;
 
-	virtual void setBackgroundAlpha(const float32 alpha) final
-			{
-				alpha_ = alpha;
-			}
-    
+	virtual void setBackgroundAlpha(const float32 alpha) override final
+	{
+		alpha_ = alpha;
+	}
+
 private:
 	void initialize();
-	
+
 	uint32 flags_;
 	std::string title_;
-	
+
 	float32 alpha_ = 1.0f;
 
 	ImGuiWindowFlags imguiFlags_;

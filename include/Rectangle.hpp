@@ -25,9 +25,9 @@ public:
 	virtual ~Rectangle() final = default;
 
 	virtual void tick(const float32 delta) final
-			{
+	{
 		ImGui::GetWindowDrawList()->AddRect(detail::toImgui(start_), detail::toImgui(end_), color_.color());
-			}
+	}
 
 	virtual void setPoints(const glm::vec2& start, const glm::vec2& end) final
 	{
@@ -36,22 +36,24 @@ public:
 	}
 
 	virtual const glm::vec2& getStartPoint() const final
-			{
+	{
 				return start_;
-			}
+	}
+
 	virtual const glm::vec2& getEndPoint() const  final
-			{
+	{
 		return end_;
-			}
+	}
 
 	virtual void setColor(const Color& color) final
-			{
+	{
 		color_ = color;
-			}
+	}
+
 	virtual const Color& getColor() const  final
-			{
+	{
 		return color_;
-			}
+	}
 
 private:
 	glm::vec2 start_;

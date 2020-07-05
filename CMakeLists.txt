@@ -20,6 +20,7 @@ endif()
 find_package(OpenGL REQUIRED)
 
 include_directories(glew/glew/include)
+include_directories(imgui)
 
 if(CMAKE_BUILD_TYPE MATCHES Debug OR CMAKE_BUILD_TYPE MATCHES RelWithDebInfo OR ICEENGINE_ENABLE_DEBUG_LOGGING)
   list(APPEND IMGUI_PLUGIN_DEFINITIONS -DICEENGINE_ENABLE_DEBUG_LOGGING)
@@ -33,7 +34,7 @@ endif()
 include_directories(include)
 
 # Source
-file(GLOB_RECURSE SOURCES "src/*.cpp")
+file(GLOB_RECURSE SOURCES "src/*.cpp" "imgui/imgui/misc/cpp/imgui_stdlib.cpp")
 
 add_library(imgui_plugin SHARED ${SOURCES})
 
