@@ -27,7 +27,7 @@ public:
     void destroy(const ITreeNode* treeNode) override;
 
     void setLabel(const std::string& label) override;
-    const std::string& getLabel() const override;
+    const std::string& label() const override;
 
     void setCallback(std::function<void(ITreeNode*)>& callback);
     void setSelectedCallback(std::function<void(ITreeNode*)> selectedCallback);

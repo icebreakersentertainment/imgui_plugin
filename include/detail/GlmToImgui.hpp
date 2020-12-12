@@ -4,7 +4,7 @@
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
 
-#include "imgui.h"
+#include <imgui/imgui.h>
 
 namespace ice_engine
 {

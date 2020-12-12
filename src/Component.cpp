@@ -1,6 +1,6 @@
 #include <algorithm>
 
-#include "imgui.h"
+#include <imgui/imgui.h>
 
 #include "Component.hpp"
 
@@ -37,14 +37,10 @@ void Component::render()
 
 void Component::tick(const float32 delta)
 {
-    ImGui::PushID(uuid_.c_str());
-
 	for (auto& component : components_)
 	{
 		component->tick(delta);
 	}
-
-    ImGui::PopID();
 
 	repositioned_ = false;
 	resized_ = false;
@@ -57,7 +53,7 @@ void Component::setPosition(const uint32 x, const uint32 y)
 	repositioned_ = true;
 }
 
-glm::ivec2 Component::getPosition() const
+glm::ivec2 Component::position() const
 {
 	return glm::ivec2(x_, y_);
 }
@@ -69,7 +65,7 @@ void Component::setDimensions(const uint32 width, const uint32 height)
 	resized_ = true;
 }
 
-glm::ivec2 Component::getDimensions() const
+glm::ivec2 Component::dimensions() const
 {
 	return glm::ivec2(width_, height_);
 }

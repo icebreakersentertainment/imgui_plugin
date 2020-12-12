@@ -1,9 +1,9 @@
 #ifndef WINDOW_H_
 #define WINDOW_H_
 
-#include "graphics/gui/IWindow.hpp"
+#include <imgui/imgui.h>
 
-#include "imgui.h"
+#include "graphics/gui/IWindow.hpp"
 
 #include "Component.hpp"
 #include "GenericComponentContainer.hpp"
@@ -20,7 +20,6 @@ class Window : public GenericComponentContainer, public IWindow
 public:
 	Window(const uint32 x, const uint32 y, const uint32 width, const uint32 height, const std::string& title = std::string());
 	Window(const uint32 x, const uint32 y, const uint32 width, const uint32 height, const uint32 flags, const std::string& title = std::string());
-	virtual ~Window();
 
 	virtual void tick(const float32 delta) override;
 
@@ -30,7 +29,7 @@ public:
 	virtual void destroy(const IRectangle* rectangle) override final;
 
 	virtual void setTitle(const std::string& title) override;
-	virtual const std::string& getTitle() const override;
+	virtual const std::string& title() const override;
 
 	virtual void setBackgroundAlpha(const float32 alpha) override final
 	{

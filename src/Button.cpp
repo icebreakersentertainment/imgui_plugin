@@ -1,6 +1,6 @@
-#include "Button.hpp"
+#include <imgui/imgui.h>
 
-#include "imgui.h"
+#include "Button.hpp"
 
 namespace ice_engine
 {
@@ -34,10 +34,14 @@ void Button::initialize()
 
 void Button::tick(const float32 delta)
 {
+    ImGui::PushID(uuid_.c_str());
+
 	if (ImGui::Button(label_.c_str()))
 	{
 		callback_();
 	}
+
+    ImGui::PopID();
 }
 
 void Button::setLabel(const std::string& label)
@@ -45,7 +49,7 @@ void Button::setLabel(const std::string& label)
 	label_ = label;
 }
 
-const std::string& Button::getLabel() const
+const std::string& Button::label() const
 {
 	return label_;
 }

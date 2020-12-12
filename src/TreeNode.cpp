@@ -1,12 +1,9 @@
 #include <algorithm>
 #include <iostream>
 
-#include "imgui.h"
+#include <imgui/imgui.h>
 
 #include "TreeNode.hpp"
-
-#include "../include/TreeNode.hpp"
-
 
 namespace ice_engine
 {
@@ -68,7 +65,7 @@ ITreeNode* TreeNode::createNode(const std::string& label)
 ITreeNode* TreeNode::getNode(const std::string& label)
 {
     auto func = [&label](const auto& n) {
-        return n->getLabel() == label;
+        return n->label() == label;
     };
 
     auto it = std::find_if(treeNodes_.begin(), treeNodes_.end(), func);
@@ -100,7 +97,7 @@ void TreeNode::setLabel(const std::string& label)
     label_ = label;
 }
 
-const std::string& TreeNode::getLabel() const
+const std::string& TreeNode::label() const
 {
     return label_;
 }

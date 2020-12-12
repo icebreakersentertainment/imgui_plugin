@@ -1,14 +1,14 @@
 #include <GL/glew.h>
 
-#include <imgui.h>
+#include <imgui/imgui.h>
 #include "imgui_impl_sdl_gl3.h"
 
 #include "Gui.hpp"
 
 #include "graphics/Event.hpp"
 #include "graphics/Keyboard.hpp"
-#include "../../../ice_engine/include/graphics/Event.hpp"
 #include "../include/Gui.hpp"
+
 
 namespace ice_engine
 {
@@ -19,11 +19,15 @@ namespace gui
 
 void shutdown(ImGuiData* imGuiData)
 {
+    auto previousContext = ImGui::GetCurrentContext();
+
 	ImGui::SetCurrentContext(imGuiData->context);
 
 	ImGui_ImplSdlGL3_Shutdown(imGuiData->sdlData);
 
 	ImGui::DestroyContext(imGuiData->context);
+
+    ImGui::SetCurrentContext(previousContext);
 }
 
 Gui::Gui(
@@ -56,6 +60,8 @@ void Gui::initialize()
 	//memset(sdlData_, 0, sizeof(SdlData));
 
 	imGuiData_->context = ImGui::CreateContext();
+
+    auto previousContext = ImGui::GetCurrentContext();
 
     ImGui::SetCurrentContext(imGuiData_->context);
 
@@ -91,6 +97,8 @@ void Gui::initialize()
 	graphicsEngine_->addEventListener(this);
 
 	ImGui_ImplSdlGL3_NewFrame(imGuiData_->sdlData);
+
+    ImGui::SetCurrentContext(previousContext);
 }
 
 void Gui::setViewport(const uint32 width, const uint32 height)
@@ -98,17 +106,23 @@ void Gui::setViewport(const uint32 width, const uint32 height)
 	//width_ = width;
 	//height_ = height;
 
+    auto previousContext = ImGui::GetCurrentContext();
+
 	ImGui::SetCurrentContext(imGuiData_->context);
 
 	ImGuiIO& io = ImGui::GetIO();
-  io.DisplaySize = ImVec2((float)width, (float)height);
-  io.DisplayFramebufferScale = ImVec2(width > 0 ? ((float)width / width) : 0, height > 0 ? ((float)height / height) : 0);
+    io.DisplaySize = ImVec2((float)width, (float)height);
+    io.DisplayFramebufferScale = ImVec2(width > 0 ? ((float)width / width) : 0, height > 0 ? ((float)height / height) : 0);
+
+    ImGui::SetCurrentContext(previousContext);
 }
 
 void Gui::render()
 {
 	if (visible())
 	{
+        auto previousContext = ImGui::GetCurrentContext();
+
 		ImGui::SetCurrentContext(imGuiData_->context);
 		//ImGui_ImplSdlGL3_NewFrame();
 
@@ -126,11 +140,15 @@ void Gui::render()
 
 		auto drawData = ImGui::GetDrawData();
 		ImGui_ImplSdlGL3_RenderDrawLists(imGuiData_->sdlData, drawData);
+
+        ImGui::SetCurrentContext(previousContext);
 	}
 }
 
 void Gui::tick(const float32 delta)
 {
+    auto previousContext = ImGui::GetCurrentContext();
+
 	ImGui::SetCurrentContext(imGuiData_->context);
 
 	ImGui_ImplSdlGL3_NewFrame(imGuiData_->sdlData);
@@ -146,6 +164,49 @@ void Gui::tick(const float32 delta)
 	{
 		window->tick(delta);
 	}
+
+	// We do the creation and destruction asynchronously so that we don't concurrently modify the windows_ or components_ vectors
+    {
+        std::lock_guard<std::mutex> lockGuard(componentsCreatedMutex_);
+        for (auto& component : componentsCreated_)
+        {
+            components_.push_back(std::move(component));
+        }
+
+        componentsCreated_.clear();
+    }
+
+    {
+        std::lock_guard<std::mutex> lockGuard(componentsDeletedMutex_);
+        for (const auto component : componentsDeleted_)
+        {
+            internalDestroy(component);
+        }
+
+        componentsDeleted_.clear();
+    }
+
+    {
+        std::lock_guard<std::mutex> lockGuard(windowsCreatedMutex_);
+        for (auto& window : windowsCreated_)
+        {
+            windows_.push_back(std::move(window));
+        }
+
+        windowsCreated_.clear();
+    }
+
+    {
+        std::lock_guard<std::mutex> lockGuard(windowsDeletedMutex_);
+        for (const auto window : windowsDeleted_)
+        {
+            internalDestroy(window);
+        }
+
+        windowsDeleted_.clear();
+    }
+
+    ImGui::SetCurrentContext(previousContext);
 }
 
 bool Gui::visible() const
@@ -161,17 +222,23 @@ void Gui::setVisible(const bool visible)
 IWindow* Gui::createWindow(const uint32 x, const uint32 y, const uint32 width, const uint32 height, const std::string title)
 {
 	auto window = std::make_unique<Window>(x, y, width, height, title);
-	windows_.push_back( std::move(window) );
+    auto ptr = window.get();
 
-	return windows_.back().get();
+    std::lock_guard<std::mutex> lockGuard(windowsCreatedMutex_);
+    windowsCreated_.push_back( std::move(window) );
+
+	return ptr;
 }
 
 IWindow* Gui::createWindow(const uint32 x, const uint32 y, const uint32 width, const uint32 height, const uint32 flags, const std::string title)
 {
 	auto window = std::make_unique<Window>(x, y, width, height, flags, title);
-	windows_.push_back( std::move(window) );
+    auto ptr = window.get();
 
-	return windows_.back().get();
+    std::lock_guard<std::mutex> lockGuard(windowsCreatedMutex_);
+    windowsCreated_.push_back( std::move(window) );
+
+	return ptr;
 }
 
 IMainMenuBar* Gui::createMainMenuBar()
@@ -194,29 +261,43 @@ void Gui::destroyMainMenuBar()
 IPopupModal* Gui::createPopupModal(const std::string& title)
 {
 	auto popupModal = std::make_unique<PopupModal>(title);
-	auto popupModalPtr = popupModal.get();
-	components_.push_back( std::move(popupModal) );
+	auto ptr = popupModal.get();
 
-	return popupModalPtr;
+	std::lock_guard<std::mutex> lockGuard(componentsCreatedMutex_);
+    componentsCreated_.push_back( std::move(popupModal) );
+
+	return ptr;
 }
 
 void Gui::destroy(const IPopupModal* popupModal)
 {
-	components_.erase(
-		std::remove_if(
-			components_.begin(),
-			components_.end(),
-			[popupModal](const std::unique_ptr<IComponent>& c) {
-				return c.get() == popupModal;
-			}
-		),
-		components_.end()
-	);
+    std::lock_guard<std::mutex> lockGuard(componentsDeletedMutex_);
+    componentsDeleted_.push_back(popupModal);
+}
+
+void Gui::internalDestroy(const IComponent* component)
+{
+    components_.erase(
+        std::remove_if(
+            components_.begin(),
+            components_.end(),
+            [component](const std::unique_ptr<IComponent>& c) {
+                return c.get() == component;
+            }
+        ),
+        components_.end()
+    );
 }
 
 void Gui::destroy(const IWindow* window)
 {
-	windows_.erase(
+    std::lock_guard<std::mutex> lockGuard(windowsDeletedMutex_);
+    windowsDeleted_.push_back(window);
+}
+
+void Gui::internalDestroy(const IWindow* window)
+{
+    windows_.erase(
 		std::remove_if(
 			windows_.begin(),
 			windows_.end(),
@@ -235,6 +316,8 @@ bool Gui::processEvent(const graphics::WindowEvent& event)
 
 bool Gui::processEvent(const graphics::KeyboardEvent& event)
 {
+    auto previousContext = ImGui::GetCurrentContext();
+
 	ImGui::SetCurrentContext(imGuiData_->context);
 
     ImGuiIO& io = ImGui::GetIO();
@@ -247,23 +330,39 @@ bool Gui::processEvent(const graphics::KeyboardEvent& event)
     io.KeyAlt = event.keySym.mod & graphics::KEYMOD_ALT;
     io.KeySuper = event.keySym.mod & graphics::KEYMOD_GUI;
 
-	return ImGui::GetIO().WantCaptureKeyboard || ImGui::GetIO().WantTextInput;
+//    bool wantKeyboardOrTextInput = ImGui::GetIO().WantCaptureKeyboard || ImGui::GetIO().WantTextInput;
+
+    ImGui::SetCurrentContext(previousContext);
+
+//	return wantKeyboardOrTextInput;
+
+	return false;
 }
 
 
 bool Gui::processEvent(const graphics::TextInputEvent& event)
 {
+    auto previousContext = ImGui::GetCurrentContext();
+
     ImGui::SetCurrentContext(imGuiData_->context);
 
     ImGuiIO& io = ImGui::GetIO();
 
     io.AddInputCharactersUTF8(&event.text[0]);
 
-    return ImGui::GetIO().WantCaptureKeyboard || ImGui::GetIO().WantTextInput;
+//    bool wantKeyboardOrTextInput = ImGui::GetIO().WantCaptureKeyboard || ImGui::GetIO().WantTextInput;
+
+    ImGui::SetCurrentContext(previousContext);
+
+//    return wantKeyboardOrTextInput;
+
+    return false;
 }
 
 bool Gui::processEvent(const graphics::MouseButtonEvent& event)
 {
+    auto previousContext = ImGui::GetCurrentContext();
+
 	ImGui::SetCurrentContext(imGuiData_->context);
 
 	ImGuiIO& io = ImGui::GetIO();
@@ -288,34 +387,73 @@ bool Gui::processEvent(const graphics::MouseButtonEvent& event)
 			break;
 	}
 
-	return ImGui::GetIO().WantCaptureMouse;
+//	bool wantCaptureMouse = ImGui::GetIO().WantCaptureMouse;
+
+    ImGui::SetCurrentContext(previousContext);
+
+//	return wantCaptureMouse;
+
+    return false;
 }
 
 bool Gui::processEvent(const graphics::MouseMotionEvent& event)
 {
+    auto previousContext = ImGui::GetCurrentContext();
+
 	ImGui::SetCurrentContext(imGuiData_->context);
 
 	ImGuiIO& io = ImGui::GetIO();
 
 	io.MousePos = ImVec2((float)event.x, (float)event.y);
 
-	return ImGui::GetIO().WantCaptureMouse;
+//    bool wantCaptureMouse = ImGui::GetIO().WantCaptureMouse;
+
+    ImGui::SetCurrentContext(previousContext);
+
+//    return wantCaptureMouse;
+
+    return false;
 }
 
 bool Gui::processEvent(const graphics::MouseWheelEvent& event)
 {
+    auto previousContext = ImGui::GetCurrentContext();
+
 	ImGui::SetCurrentContext(imGuiData_->context);
 
 	ImGuiIO& io = ImGui::GetIO();
 
-	//nk_input_scroll(ctx_, nk_vec2((float)event.x,(float)event.y));
-	io.MouseWheel = (event.y > 0 ? 1 : -1);
+    if (event.x > 0)
+    {
+        io.MouseWheelH += 1.0f;
+    }
+    else if (event.x < 0)
+    {
+        io.MouseWheelH -= 1.0f;
+    }
 
-	return ImGui::GetIO().WantCaptureMouse;
+    if (event.y > 0)
+    {
+        io.MouseWheel += 1.0f;
+    }
+    else if (event.y < 0)
+    {
+        io.MouseWheel -= 1.0f;
+    }
+
+//    bool wantCaptureMouse = ImGui::GetIO().WantCaptureMouse;
+
+    ImGui::SetCurrentContext(previousContext);
+
+//    return wantCaptureMouse;
+
+    return false;
 }
 
 bool Gui::processEvent(const graphics::Event& event)
 {
+    auto previousContext = ImGui::GetCurrentContext();
+
 	ImGui::SetCurrentContext(imGuiData_->context);
 
 	switch(event.type)
@@ -331,12 +469,17 @@ bool Gui::processEvent(const graphics::Event& event)
 					break;
 			}
 
-			return true;
-			break;
+            ImGui::SetCurrentContext(previousContext);
+
+//			return true;
+            return false;
+            break;
 
 		default:
 			break;
 	}
+
+    ImGui::SetCurrentContext(previousContext);
 
 	return false;
 }

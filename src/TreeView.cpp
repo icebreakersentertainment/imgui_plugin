@@ -1,12 +1,11 @@
 #include <algorithm>
 #include <iostream>
 
-#include "imgui.h"
+#include <imgui/imgui.h>
 
 #include "TreeView.hpp"
 
 #include "TreeNode.hpp"
-#include "../include/TreeView.hpp"
 
 namespace ice_engine
 {
@@ -48,7 +47,7 @@ ITreeNode* TreeView::createNode(const std::string& label)
 ITreeNode* TreeView::getNode(const std::string& label)
 {
     auto func = [&label](const auto& n) {
-        return n->getLabel() == label;
+        return n->label() == label;
     };
 
     auto it = std::find_if(treeNodes_.begin(), treeNodes_.end(), func);

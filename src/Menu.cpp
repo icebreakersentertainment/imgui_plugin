@@ -1,6 +1,6 @@
-#include "Menu.hpp"
+#include <imgui/imgui.h>
 
-#include "imgui.h"
+#include "Menu.hpp"
 
 #include "MenuItem.hpp"
 #include "Separator.hpp"
@@ -45,7 +45,7 @@ void Menu::setLabel(const std::string& label)
 	label_ = label;
 }
 
-const std::string& Menu::getLabel() const 
+const std::string& Menu::label() const
 {
 	return label_;
 }

@@ -35,12 +35,12 @@ public:
 		end_ = end;
 	}
 
-	virtual const glm::vec2& getStartPoint() const final
+	virtual const glm::vec2& startPoint() const final
 	{
 				return start_;
 	}
 
-	virtual const glm::vec2& getEndPoint() const  final
+	virtual const glm::vec2& endPoint() const  final
 	{
 		return end_;
 	}
@@ -50,7 +50,7 @@ public:
 		color_ = color;
 	}
 
-	virtual const Color& getColor() const  final
+	virtual const Color& color() const  final
 	{
 		return color_;
 	}

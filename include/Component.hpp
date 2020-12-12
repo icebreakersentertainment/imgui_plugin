@@ -52,23 +52,23 @@ public:
 		customStyle_ = true;
 	}
 
-	virtual const Style& getStyle() const override
+	virtual const Style& style() const override
 	{
 		return style_;
 	}
 
 	virtual void setPosition(const uint32 x, const uint32 y) override;
-	virtual glm::ivec2 getPosition() const override;
+	virtual glm::ivec2 position() const override;
 
 	virtual void setDimensions(const uint32 width, const uint32 height) override;
-	virtual glm::ivec2 getDimensions() const  override;
+	virtual glm::ivec2 dimensions() const  override;
 
 	virtual void addComponent(IComponent* component) override;
 	virtual void removeComponent(IComponent* component) override;
 	virtual void removeAllComponents() override;
 
 protected:
-	virtual ~Component() = default;
+	virtual ~Component() override = default;
 
 	uint32 x_ = 0;
 	uint32 y_ = 0;

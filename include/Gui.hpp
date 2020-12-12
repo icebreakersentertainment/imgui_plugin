@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <memory>
+#include <mutex>
 
 #include "graphics/IGraphicsEngine.hpp"
 #include "graphics/gui/IGui.hpp"
@@ -18,8 +19,8 @@
 #include "logger/ILogger.hpp"
 #include "fs/IFileSystem.hpp"
 
-class ImGuiContext;
-class SdlData;
+struct ImGuiContext;
+struct SdlData;
 
 namespace ice_engine
 {
@@ -59,7 +60,7 @@ public:
 		// TODO: set the global style
 	}
 
-	virtual const Style& getStyle() const final
+	virtual const Style& style() const final
 	{
 		return style_;
 	}
@@ -96,12 +97,23 @@ private:
 	std::unique_ptr<ImGuiData, void(*)(ImGuiData*)> imGuiData_;
 
 	std::vector<std::unique_ptr<IComponent>> components_;
+	std::mutex componentsCreatedMutex_;
+	std::vector<std::unique_ptr<IComponent>> componentsCreated_;
+    std::mutex componentsDeletedMutex_;
+	std::vector<const IComponent*> componentsDeleted_;
 	std::vector<std::unique_ptr<IWindow>> windows_;
+    std::mutex windowsCreatedMutex_;
+	std::vector<std::unique_ptr<IWindow>> windowsCreated_;
+    std::mutex windowsDeletedMutex_;
+	std::vector<const IWindow*> windowsDeleted_;
 	std::unique_ptr<IMainMenuBar> mainMenuBar_;
 
 	Style style_;
 
 	void initialize();
+
+    void internalDestroy(const IComponent* component);
+    void internalDestroy(const IWindow* window);
 };
 
 }

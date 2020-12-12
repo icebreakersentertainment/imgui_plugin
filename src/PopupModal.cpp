@@ -21,12 +21,16 @@ void PopupModal::initialize()
 
 void PopupModal::tick(const float32 delta)
 {
+    ImGui::PushID(uuid_.c_str());
+
 	if (visible_) ImGui::OpenPopup(title_.c_str());
 
 	if (ImGui::BeginPopupModal(title_.c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize))
 	{
 		Component::tick(delta);
 	}
+
+    ImGui::PopID();
 }
 
 void PopupModal::close()

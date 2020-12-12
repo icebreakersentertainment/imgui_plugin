@@ -16,9 +16,6 @@ namespace gui
 class GuiFactory : public IGuiFactory
 {
 public:
-	GuiFactory();
-	virtual ~GuiFactory();
-
 	virtual std::unique_ptr<IGui> create(
 		utilities::Properties* properties,
 		fs::IFileSystem* fileSystem,

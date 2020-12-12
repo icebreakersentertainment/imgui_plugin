@@ -1,9 +1,9 @@
 #ifndef POPUPMODAL_H_
 #define POPUPMODAL_H_
 
-#include "graphics/gui/IPopupModal.hpp"
+#include <imgui/imgui.h>
 
-#include "imgui.h"
+#include "graphics/gui/IPopupModal.hpp"
 
 #include "Component.hpp"
 #include "GenericComponentContainer.hpp"

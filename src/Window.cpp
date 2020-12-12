@@ -34,11 +34,6 @@ Window::Window(const uint32 x, const uint32 y, const uint32 width, const uint32 
 	initialize();
 }
 
-Window::~Window()
-{
-
-}
-
 void Window::initialize()
 {
 	if (!(flags_ & ICEENGINE_TITLE_BAR))
@@ -106,6 +101,8 @@ void Window::tick(const float32 delta)
 {
 	if (visible_)
 	{
+        ImGui::PushID(uuid_.c_str());
+
 		ImGui::SetNextWindowPos(ImVec2(x_, y_), repositioned_ ? ImGuiCond_Always : ImGuiCond_Once);
 		ImGui::SetNextWindowSize(ImVec2(width_, height_), resized_ ? ImGuiCond_Always : ImGuiCond_Once);
 		ImGui::SetNextWindowBgAlpha(alpha_);
@@ -123,6 +120,8 @@ void Window::tick(const float32 delta)
 		ImGui::End();
 
 		if (customStyle_) ImGui::PopStyleVar(1);
+
+        ImGui::PopID();
 	}
 }
 
@@ -163,7 +162,7 @@ void Window::setTitle(const std::string& title)
 	title_ = title;
 }
 
-const std::string& Window::getTitle() const
+const std::string& Window::title() const
 {
 	return title_;
 }

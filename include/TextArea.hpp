@@ -1,12 +1,10 @@
-#ifndef TEXTFIELD_H_
-#define TEXTFIELD_H_
+#ifndef TEXTAREA_HPP_
+#define TEXTAREA_HPP_
 
 #include <string>
 #include <vector>
 
-#include <imgui/imgui.h>
-
-#include "graphics/gui/ITextField.hpp"
+#include "graphics/gui/ITextArea.hpp"
 
 #include "Component.hpp"
 #include "Types.hpp"
@@ -18,13 +16,13 @@ namespace graphics
 namespace gui
 {
 
-class TextField : public Component, public ITextField
+class TextArea : public Component, public ITextArea
 {
 public:
-    TextField(const std::string& text = std::string());
-    TextField(const uint32 x, const uint32 y, const uint32 width, const uint32 height, const std::string& text = std::string());
+    TextArea(const std::string& text = std::string());
+    TextArea(const uint32 x, const uint32 y, const uint32 width, const uint32 height, const std::string& text = std::string());
 
-    virtual ~TextField() override = default;
+    virtual ~TextArea() = default;
 
     virtual void tick(const float32 delta) override;
 
@@ -40,6 +38,7 @@ public:
      * @return
      */
     int inputTextCallback(ImGuiInputTextCallbackData* data);
+
 private:
     std::string text_;
 
@@ -51,4 +50,5 @@ private:
 }
 }
 
-#endif //TEXTFIELD_H_
+
+#endif //TEXTAREA_HPP_

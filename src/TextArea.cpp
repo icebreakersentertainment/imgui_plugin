@@ -4,8 +4,7 @@
 #include <imgui/imgui.h>
 #include "imgui/misc/cpp/imgui_stdlib.h"
 
-#include "TextField.hpp"
-
+#include "TextArea.hpp"
 
 namespace ice_engine
 {
@@ -16,8 +15,8 @@ namespace gui
 
 static int InputTextCallback(ImGuiInputTextCallbackData* data)
 {
-    TextField* textField = static_cast<TextField*>(data->UserData);
-    return textField->inputTextCallback(data);
+    TextArea* textArea = static_cast<TextArea*>(data->UserData);
+    return textArea->inputTextCallback(data);
 //    std::cout << "HERE "
 //    << data->EventChar << " | "
 //    << data->EventKey << " | "
@@ -27,21 +26,21 @@ static int InputTextCallback(ImGuiInputTextCallbackData* data)
 //    return 0;
 }
 
-TextField::TextField(const std::string& text)
+TextArea::TextArea(const std::string& text)
 {
     setText(text);
 }
 
-TextField::TextField(const uint32 x, const uint32 y, const uint32 width, const uint32 height, const std::string& text) : Component(x, y, width, height)
+TextArea::TextArea(const uint32 x, const uint32 y, const uint32 width, const uint32 height, const std::string& text) : Component(x, y, width, height)
 {
     setText(text);
 }
 
-void TextField::tick(const float32 delta)
+void TextArea::tick(const float32 delta)
 {
     ImGui::PushID(uuid_.c_str());
 
-    ImGui::InputText("", &text_, ImGuiInputTextFlags_CallbackAlways, InputTextCallback, this);
+    ImGui::InputTextMultiline("", &text_, {static_cast<float32>(width_), static_cast<float32>(height_)}, ImGuiInputTextFlags_CallbackAlways, InputTextCallback, this);
 
     if (callOnChangeCallback_)
     {
@@ -52,32 +51,32 @@ void TextField::tick(const float32 delta)
     ImGui::PopID();
 }
 
-void TextField::setText(const std::string& text)
+void TextArea::setText(const std::string& text)
 {
     text_ = text;
 }
 
-const std::string& TextField::text() const
+const std::string& TextArea::text() const
 {
     return text_;
 }
 
-void TextField::setOnChangeCallback(std::function<void()>& onChangeCallback)
+void TextArea::setOnChangeCallback(std::function<void()>& onChangeCallback)
 {
     onChangeCallback_ = onChangeCallback;
 }
 
-int TextField::inputTextCallback(ImGuiInputTextCallbackData* data)
+int TextArea::inputTextCallback(ImGuiInputTextCallbackData* data)
 {
     if (data->BufTextLen != text_.size())
     {
 //        std::cout << "HERE "
-//            << data->EventChar << " | "
-//            << data->EventKey << " | "
-//            << data->BufTextLen << " | "
-//            << data->BufDirty << " | "
-//            << text_.size() << " | "
-//            << std::endl;
+//                  << data->EventChar << " | "
+//                  << data->EventKey << " | "
+//                  << data->BufTextLen << " | "
+//                  << data->BufDirty << " | "
+//                  << text_.size() << " | "
+//                  << std::endl;
         // We can't just call the callback here because text_ hasn't actually changed yet
         callOnChangeCallback_ = true;
     }

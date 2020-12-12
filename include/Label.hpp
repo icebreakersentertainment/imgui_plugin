@@ -22,7 +22,7 @@ public:
 	virtual void tick(const float32 delta) override;
 
 	virtual void setLabel(const std::string& label) override;
-	virtual const std::string& getLabel() const override;
+	virtual const std::string& label() const override;
 
 private:
 	void initialize();

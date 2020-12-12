@@ -1,6 +1,6 @@
 #include <algorithm>
 
-#include "imgui.h"
+#include <imgui/imgui.h>
 
 #include "ComboBox.hpp"
 #include "ComboBoxItem.hpp"
@@ -14,7 +14,9 @@ namespace gui
 
 void ComboBox::tick(const float32 delta)
 {
-    const std::string& currentItemLabel = selected_ != nullptr ? selected_->getLabel() : "";
+    const std::string& currentItemLabel = selected_ != nullptr ? selected_->label() : "";
+
+    ImGui::PushID(uuid_.c_str());
 
     if (ImGui::BeginCombo("", currentItemLabel.c_str()))
     {
@@ -22,7 +24,7 @@ void ComboBox::tick(const float32 delta)
         {
             bool isSelected = (selected_ == item.get());
 
-            if (ImGui::Selectable(item->getLabel().c_str(), isSelected))
+            if (ImGui::Selectable(item->label().c_str(), isSelected))
             {
                 selected_ = item.get();
                 callback_(selected_);
@@ -36,6 +38,8 @@ void ComboBox::tick(const float32 delta)
 
         ImGui::EndCombo();
     }
+
+    ImGui::PopID();
 }
 
 IComboBoxItem* ComboBox::createItem(const std::string& label)
@@ -50,7 +54,7 @@ IComboBoxItem* ComboBox::createItem(const std::string& label)
 IComboBoxItem* ComboBox::getItem(const std::string& label) const
 {
     auto func = [&label](const auto& cbi) {
-        return cbi->getLabel() == label;
+        return cbi->label() == label;
     };
 
     auto it = std::find_if(comboBoxItems_.begin(), comboBoxItems_.end(), func);

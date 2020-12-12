@@ -1,6 +1,6 @@
-#include "Label.hpp"
+#include <imgui/imgui.h>
 
-#include "imgui.h"
+#include "Label.hpp"
 
 namespace ice_engine
 {
@@ -34,7 +34,11 @@ void Label::initialize()
 
 void Label::tick(const float32 delta)
 {
+    ImGui::PushID(uuid_.c_str());
+
 	ImGui::Text(label_.c_str());
+
+    ImGui::PopID();
 }
 
 void Label::setLabel(const std::string& label)
@@ -42,7 +46,7 @@ void Label::setLabel(const std::string& label)
 	label_ = label;
 }
 
-const std::string& Label::getLabel() const
+const std::string& Label::label() const
 {
 	return label_;
 }

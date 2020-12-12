@@ -1,5 +1,4 @@
 #include "ComboBoxItem.hpp"
-#include "../include/ComboBoxItem.hpp"
 
 namespace ice_engine
 {
@@ -17,7 +16,7 @@ void ComboBoxItem::setLabel(const std::string& label)
     label_ = label;
 }
 
-const std::string& ComboBoxItem::getLabel() const
+const std::string& ComboBoxItem::label() const
 {
     return label_;
 }

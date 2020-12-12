@@ -1,12 +1,15 @@
 #include <algorithm>
+#include <memory>
 
 #include "GenericComponentContainer.hpp"
 
 #include "Label.hpp"
 #include "Button.hpp"
 #include "TextField.hpp"
+#include "TextArea.hpp"
 #include "ComboBox.hpp"
 #include "TreeView.hpp"
+#include "imguicolortextedit/TextEditor.hpp"
 
 namespace ice_engine
 {
@@ -90,14 +93,14 @@ IButton* GenericComponentContainer::createButton(const uint32 x, const uint32 y,
 	return buttonPtr;
 }
 
-ITextField* GenericComponentContainer::createTextField(const std::string label)
-{
-    return create<TextField>(components_, label);
-}
-
 ITreeView* GenericComponentContainer::createTreeView()
 {
     return create<TreeView>(components_);
+}
+
+ITextField* GenericComponentContainer::createTextField(const std::string label)
+{
+    return create<TextField>(components_, label);
 }
 
 ITextField* GenericComponentContainer::createTextField(const uint32 x, const uint32 y, const uint32 width, const uint32 height, const std::string label)
@@ -105,42 +108,74 @@ ITextField* GenericComponentContainer::createTextField(const uint32 x, const uin
     return create<TextField>(components_, x, y, width, height, label);
 }
 
+ITextArea* GenericComponentContainer::createTextArea(const std::string label)
+{
+    return create<TextArea>(components_, label);
+}
+
+ITextArea* GenericComponentContainer::createTextArea(const uint32 x, const uint32 y, const uint32 width, const uint32 height, const std::string label)
+{
+    return create<TextArea>(components_, x, y, width, height, label);
+}
+
 IComboBox* GenericComponentContainer::createComboBox()
 {
     return create<ComboBox>(components_);
 }
 
+ITextEditor* GenericComponentContainer::createTextEditor(const std::string text)
+{
+    return create<TextEditor>(components_, text);
+}
+
+ITextEditor* GenericComponentContainer::createTextEditor(const uint32 x, const uint32 y, const uint32 width, const uint32 height, const std::string text)
+{
+    return create<TextEditor>(components_, x, y, width, height, text);
+}
+
+void GenericComponentContainer::add(std::unique_ptr <IComponent> component)
+{
+    components_.push_back(std::move(component));
+}
+
 void GenericComponentContainer::destroy(const ILabel* label)
 {
-	components_.erase(
-		std::remove_if(
-			components_.begin(),
-			components_.end(),
-			[label](const std::unique_ptr<IComponent>& c) {
-				return c.get() == label;
-			}
-		),
-		components_.end()
-	);
+    gui::destroy(components_, label);
+//	components_.erase(
+//		std::remove_if(
+//			components_.begin(),
+//			components_.end(),
+//			[label](const std::unique_ptr<IComponent>& c) {
+//				return c.get() == label;
+//			}
+//		),
+//		components_.end()
+//	);
 }
 
 void GenericComponentContainer::destroy(const IButton* button)
 {
-	components_.erase(
-		std::remove_if(
-			components_.begin(),
-			components_.end(),
-			[button](const std::unique_ptr<IComponent>& c) {
-				return c.get() == button;
-			}
-		),
-		components_.end()
-	);
+    gui::destroy(components_, button);
+//	components_.erase(
+//		std::remove_if(
+//			components_.begin(),
+//			components_.end(),
+//			[button](const std::unique_ptr<IComponent>& c) {
+//				return c.get() == button;
+//			}
+//		),
+//		components_.end()
+//	);
 }
 
 void GenericComponentContainer::destroy(const ITextField* textField)
 {
 	gui::destroy(components_, textField);
+}
+
+void GenericComponentContainer::destroy(const ITextArea* textArea)
+{
+	gui::destroy(components_, textArea);
 }
 
 void GenericComponentContainer::destroy(const ITreeView* treeView)
@@ -153,6 +188,22 @@ void GenericComponentContainer::destroy(const IComboBox* comboBox)
 	gui::destroy(components_, comboBox);
 }
 
+std::unique_ptr<IComponent> GenericComponentContainer::remove(const IComponent* component)
+{
+    auto it = std::remove_if(
+        components_.begin(),
+        components_.end(),
+        [component](const std::unique_ptr<IComponent>& c) {
+            return c.get() == component;
+        }
+    );
+
+    auto returnValue = std::move(*it);
+
+    components_.erase(it);
+
+    return std::move(returnValue);
+}
 }
 }
 }

@@ -9,14 +9,6 @@ namespace graphics
 namespace gui
 {
 
-GuiFactory::GuiFactory()
-{
-}
-
-GuiFactory::~GuiFactory()
-{
-}
-
 std::unique_ptr<IGui> GuiFactory::create(
 	utilities::Properties* properties,
 	fs::IFileSystem* fileSystem,

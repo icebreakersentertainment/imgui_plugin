@@ -18,7 +18,7 @@ public:
     ~ComboBoxItem() override = default;
 
     void setLabel(const std::string& label) override;
-    const std::string& getLabel() const override;
+    const std::string& label() const override;
 
 private:
     std::string label_;
