@@ -2,6 +2,7 @@
 #define GUIPLUGIN_H_
 
 #include <memory>
+#include <mutex>
 
 #include "IGuiPlugin.hpp"
 
@@ -11,13 +12,16 @@ namespace ice_engine
 class GuiPlugin : public IGuiPlugin
 {
 public:
-	GuiPlugin();
-	virtual ~GuiPlugin();
+	GuiPlugin() = default;
+	~GuiPlugin() override = default;
 
-	virtual std::string getName() const override;
+	std::string getName() const override;
 
-	virtual std::unique_ptr<graphics::gui::IGuiFactory> createFactory() const override;
+	std::unique_ptr<graphics::gui::IGuiFactory> createFactory() const override;
 
+private:
+    mutable std::mutex glewInitializedMutex_;
+    mutable bool glewInitialized_ = false;
 };
 
 }
