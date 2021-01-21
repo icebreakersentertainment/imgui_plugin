@@ -50,7 +50,7 @@ target_include_directories(imgui_plugin PRIVATE ImGuiColorTextEdit/ImGuiColorTex
 target_include_directories(imgui_plugin PRIVATE ${ICEENGINE_INCLUDE_DIRS})
 target_include_directories(imgui_plugin PRIVATE ${Boost_INCLUDE_DIRS})
 
-target_compile_definitions(imgui_plugin PRIVATE $IMGUI_PLUGIN_DEFINITIONS})
+target_compile_definitions(imgui_plugin PRIVATE ${IMGUI_PLUGIN_DEFINITIONS})
 target_compile_options(imgui_plugin PRIVATE ${IMGUI_PLUGIN_COMPILER_FLAGS})
 
 target_link_libraries(imgui_plugin PRIVATE GLEW::GLEW)
